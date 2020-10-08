@@ -1,3 +1,5 @@
+use std::fmt::Formatter;
+
 const SCANNED_STRING_BUFFER_SIZE: usize = 16;
 
 pub struct Scanner {
@@ -390,6 +392,19 @@ impl Scanner {
             None
         } else {
             Some(Token::Invalid)
+        }
+    }
+}
+
+#[cfg(feature = "display")]
+impl core::fmt::Display for Token {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Token::Identifier => write!(f, "Identifier"),
+            Token::String => write!(f, "String"),
+            Token::Number => write!(f, "Number"),
+            Token::Finish => write!(f, "Finish"),
+            Token::Invalid => write!(f, "Invalid"),
         }
     }
 }
