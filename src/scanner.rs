@@ -131,6 +131,7 @@ impl Scanner {
         } else if b'1' <= c && c <= b'9' {
             self.clear_scanned_number();
             if self.push_digit(c - b'0', 10).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -144,12 +145,14 @@ impl Scanner {
         } else if (b'a' <= c && c <= b'z') || (b'A' <= c && c <= b'Z') {
             self.clear_scanned_string();
             if self.push_char(c).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             self.state = ScannerState::Identifier;
             None
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -163,11 +166,13 @@ impl Scanner {
             Some(Token::Identifier)
         } else if c == b'_' || (b'a' <= c && c <= b'z') || (b'A' <= c && c <= b'Z') || (b'0' <= c && c <= b'9') {
             if self.push_char(c).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             None
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -177,6 +182,7 @@ impl Scanner {
             self.state = ScannerState::Initial;
             Some(Token::Finish)
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -190,11 +196,13 @@ impl Scanner {
             None
         } else if 0x20 <= c && c <= 0x7E {
             if self.push_char(c).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             None
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -205,12 +213,14 @@ impl Scanner {
             None
         } else if b'0' <= c && c <= b'9' {
             if self.push_digit(c - b'0', 10).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             self.state = ScannerState::DecimalNumber;
             None
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -218,6 +228,7 @@ impl Scanner {
     fn scan_when_any_number(self: &mut Scanner, c: u8) -> Option<Token> {
         if c == b' ' {
             if self.finalize_scanned_number().is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -225,6 +236,7 @@ impl Scanner {
             Some(Token::Number)
         } else if c == b'\r' {
             if self.finalize_scanned_number().is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -241,6 +253,7 @@ impl Scanner {
             None
         } else if b'0' <= c && c <= b'9' {
             if self.push_digit(c - b'0', 10).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -250,6 +263,7 @@ impl Scanner {
             self.state = ScannerState::DecimalNumber;
             None
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -257,12 +271,14 @@ impl Scanner {
     fn scan_when_escape(self: &mut Scanner, c: u8) -> Option<Token> {
         if 0x20 <= c && c <= 0x7E {
             if self.push_char(c).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             self.state = ScannerState::String;
             None
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -275,6 +291,7 @@ impl Scanner {
             self.state = ScannerState::Finish;
             Some(Token::String)
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -282,6 +299,7 @@ impl Scanner {
     fn scan_when_decimal_number(self: &mut Scanner, c: u8) -> Option<Token> {
         if c == b' ' {
             if self.finalize_scanned_number().is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -289,6 +307,7 @@ impl Scanner {
             Some(Token::Number)
         } else if c == b'\r' {
             if self.finalize_scanned_number().is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -296,11 +315,13 @@ impl Scanner {
             Some(Token::Number)
         } else if b'0' <= c && c <= b'9' {
             if self.push_digit(c - b'0', 10).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             None
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -308,6 +329,7 @@ impl Scanner {
     fn scan_when_binary_number(self: &mut Scanner, c: u8) -> Option<Token> {
         if c == b' ' {
             if self.finalize_scanned_number().is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -315,6 +337,7 @@ impl Scanner {
             Some(Token::Number)
         } else if c == b'\r' {
             if self.finalize_scanned_number().is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -322,11 +345,13 @@ impl Scanner {
             Some(Token::Number)
         } else if c == b'0' || c == b'1' {
             if self.push_digit(c - b'0', 2).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             None
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -334,6 +359,7 @@ impl Scanner {
     fn scan_when_octal_number(self: &mut Scanner, c: u8) -> Option<Token> {
         if c == b' ' {
             if self.finalize_scanned_number().is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -341,6 +367,7 @@ impl Scanner {
             Some(Token::Number)
         } else if c == b'\r' {
             if self.finalize_scanned_number().is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -348,11 +375,13 @@ impl Scanner {
             Some(Token::Number)
         } else if b'0' <= c && c <= b'7' {
             if self.push_digit(c - b'0', 8).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             None
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
@@ -360,6 +389,7 @@ impl Scanner {
     fn scan_when_hexadecimal_number(self: &mut Scanner, c: u8) -> Option<Token> {
         if c == b' ' {
             if self.finalize_scanned_number().is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -367,6 +397,7 @@ impl Scanner {
             Some(Token::Number)
         } else if c == b'\r' {
             if self.finalize_scanned_number().is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
@@ -374,23 +405,27 @@ impl Scanner {
             Some(Token::Number)
         } else if b'0' <= c && c <= b'9' {
             if self.push_digit(c - b'0', 16).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             None
         } else if b'a' <= c && c <= b'f' {
             if self.push_digit(c - b'a' + 10, 16).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             None
         } else if b'A' <= c && c <= b'F' {
             if self.push_digit(c - b'A' + 10, 16).is_err() {
+                self.state = ScannerState::Initial;
                 return Some(Token::Invalid);
             }
 
             None
         } else {
+            self.state = ScannerState::Initial;
             Some(Token::Invalid)
         }
     }
