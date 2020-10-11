@@ -1,3 +1,6 @@
+#[cfg(feature = "display")]
+use core::fmt::Formatter;
+
 const SCANNED_STRING_BUFFER_SIZE: usize = 16;
 
 pub struct Scanner {
