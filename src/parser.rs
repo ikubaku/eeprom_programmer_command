@@ -1,8 +1,3 @@
-#[cfg(feature = "std")]
-use std;
-#[cfg(feature = "std")]
-use std::io::Read;
-
 use crate::scanner::Token;
 
 #[derive(PartialEq, Debug)]
@@ -237,60 +232,61 @@ where R: crate::reader::Reader {
 
 #[cfg(test)]
 mod test {
-    use crate::parser::{Parser, DeviceName};
+    use crate::parser::{Parser, DeviceName, Command};
+    use crate::reader::StandardReader;
 
     #[test]
     fn parse_read_byte() {
         let command = "rb 0x000E3B41\r\n";
-        let mut reader = crate::reader::StandardReader::new(command.as_bytes());
-        let mut parser = crate::parser::Parser::new(reader);
+        let reader = StandardReader::new(command.as_bytes());
+        let mut parser = Parser::new(reader);
         let res = parser.parse_command();
 
         assert!(res.is_ok());
-        assert_eq!(res.unwrap(), crate::parser::Command::ReadByte(0x000E3B41));
+        assert_eq!(res.unwrap(), Command::ReadByte(0x000E3B41));
     }
 
     #[test]
     fn parse_write_byte() {
         let command = "wb 0x00012000 0x42\r\n";
-        let mut reader = crate::reader::StandardReader::new(command.as_bytes());
-        let mut parser = crate::parser::Parser::new(reader);
+        let reader = StandardReader::new(command.as_bytes());
+        let mut parser = Parser::new(reader);
         let res = parser.parse_command();
 
         assert!(res.is_ok());
-        assert_eq!(res.unwrap(), crate::parser::Command::WriteByte(0x00012000, 0x42));
+        assert_eq!(res.unwrap(), Command::WriteByte(0x00012000, 0x42));
     }
 
     #[test]
     fn parse_read_data() {
         let command = "rd 0x00000010 32\r\n";
-        let mut reader = crate::reader::StandardReader::new(command.as_bytes());
-        let mut parser = crate::parser::Parser::new(reader);
+        let reader = StandardReader::new(command.as_bytes());
+        let mut parser = Parser::new(reader);
         let res = parser.parse_command();
 
         assert!(res.is_ok());
-        assert_eq!(res.unwrap(), crate::parser::Command::ReadData(0x00000010, 32));
+        assert_eq!(res.unwrap(), Command::ReadData(0x00000010, 32));
     }
 
     #[test]
     fn parse_write_page() {
         let command = "wp 0x0F\r\n";
-        let mut reader = crate::reader::StandardReader::new(command.as_bytes());
-        let mut parser = crate::parser::Parser::new(reader);
+        let reader = StandardReader::new(command.as_bytes());
+        let mut parser = Parser::new(reader);
         let res = parser.parse_command();
 
         assert!(res.is_ok());
-        assert_eq!(res.unwrap(), crate::parser::Command::WritePage(0x0F));
+        assert_eq!(res.unwrap(), Command::WritePage(0x0F));
     }
 
     #[test]
     fn parse_set_device() {
         let command = "sd xm01\r\n";
-        let mut reader = crate::reader::StandardReader::new(command.as_bytes());
-        let mut parser = crate::parser::Parser::new(reader);
+        let reader = StandardReader::new(command.as_bytes());
+        let mut parser = Parser::new(reader);
         let res = parser.parse_command();
 
         assert!(res.is_ok());
-        assert_eq!(res.unwrap(), crate::parser::Command::SetDevice(DeviceName::XM01));
+        assert_eq!(res.unwrap(), Command::SetDevice(DeviceName::XM01));
     }
 }

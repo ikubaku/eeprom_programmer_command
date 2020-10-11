@@ -1,6 +1,3 @@
-#[cfg(feature = "std")]
-use std::io::Read;
-
 #[cfg(feature = "serial")]
 use nb::block;
 
