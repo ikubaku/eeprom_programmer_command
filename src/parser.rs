@@ -31,21 +31,15 @@ pub enum DeviceName {
     XM02,
 }
 
-pub trait Parser {
-    fn parse_command(&mut self) -> Result<Command, ()>;
-}
-
-#[cfg(feature = "std")]
-pub struct StandardParser<R> {
+pub struct Parser<R> {
     reader: R,
     scanner: crate::scanner::Scanner,
 }
 
-#[cfg(feature = "std")]
-impl<R> StandardParser<R>
-where R: std::io::Read {
-    pub fn new(reader: R) -> StandardParser<R> {
-        StandardParser {
+impl<R> Parser<R>
+where R: crate::reader::Reader {
+    pub fn new(reader: R) -> Parser<R> {
+        Parser {
             reader,
             scanner: crate::scanner::Scanner::default(),
         }
@@ -53,23 +47,23 @@ where R: std::io::Read {
 
     fn get_token(&mut self) -> Result<Token, ()> {
         loop {
-            let mut c: [u8; 1] = [0];
-            if self.reader.read_exact(&mut c).is_err() {
+            let c = self.reader.read();
+            if c.is_none() {
                 return Err(());
             }
 
-            let res = self.scanner.scan_command(c[0]);
+            let res = self.scanner.scan_command(c.unwrap());
             if res.is_some() {
                 return Ok(res.unwrap());
             }
         }
     }
 
-    pub fn destroy(self: StandardParser<R>) -> R {
+    pub fn destroy(self: Parser<R>) -> R {
         self.reader
     }
 
-    fn parse_command_impl(&mut self) -> Result<Command, ()> {
+    fn parse_command(&mut self) -> Result<Command, ()> {
         let cmd = self.get_token()?;
         if cmd != Token::Identifier {
             Err(())
@@ -241,22 +235,15 @@ where R: std::io::Read {
     }
 }
 
-#[cfg(feature = "std")]
-impl<R> Parser for StandardParser<R>
-where R: std::io::Read {
-    fn parse_command(&mut self) -> Result<Command, ()> {
-        self.parse_command_impl()
-    }
-}
-
 #[cfg(test)]
 mod test {
-    use crate::parser::{Parser, StandardParser, DeviceName};
+    use crate::parser::{Parser, DeviceName};
 
     #[test]
     fn parse_read_byte() {
         let command = "rb 0x000E3B41\r\n";
-        let mut parser = crate::parser::StandardParser::new(command.as_bytes());
+        let mut reader = crate::reader::StandardReader::new(command.as_bytes());
+        let mut parser = crate::parser::Parser::new(reader);
         let res = parser.parse_command();
 
         assert!(res.is_ok());
@@ -266,7 +253,8 @@ mod test {
     #[test]
     fn parse_write_byte() {
         let command = "wb 0x00012000 0x42\r\n";
-        let mut parser = crate::parser::StandardParser::new(command.as_bytes());
+        let mut reader = crate::reader::StandardReader::new(command.as_bytes());
+        let mut parser = crate::parser::Parser::new(reader);
         let res = parser.parse_command();
 
         assert!(res.is_ok());
@@ -276,7 +264,8 @@ mod test {
     #[test]
     fn parse_read_data() {
         let command = "rd 0x00000010 32\r\n";
-        let mut parser = crate::parser::StandardParser::new(command.as_bytes());
+        let mut reader = crate::reader::StandardReader::new(command.as_bytes());
+        let mut parser = crate::parser::Parser::new(reader);
         let res = parser.parse_command();
 
         assert!(res.is_ok());
@@ -286,7 +275,8 @@ mod test {
     #[test]
     fn parse_write_page() {
         let command = "wp 0x0F\r\n";
-        let mut parser = crate::parser::StandardParser::new(command.as_bytes());
+        let mut reader = crate::reader::StandardReader::new(command.as_bytes());
+        let mut parser = crate::parser::Parser::new(reader);
         let res = parser.parse_command();
 
         assert!(res.is_ok());
@@ -296,7 +286,8 @@ mod test {
     #[test]
     fn parse_set_device() {
         let command = "sd xm01\r\n";
-        let mut parser = crate::parser::StandardParser::new(command.as_bytes());
+        let mut reader = crate::reader::StandardReader::new(command.as_bytes());
+        let mut parser = crate::parser::Parser::new(reader);
         let res = parser.parse_command();
 
         assert!(res.is_ok());
