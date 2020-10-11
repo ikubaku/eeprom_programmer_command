@@ -1,0 +1,25 @@
+= eeprom_programmer_command
+
+The command parser for https://github.com/ikubaku/eeprom_programmer.
+
+== Prerequisites
+* Rust(stable)
+
+== Usage
+TBA
+
+== Documentation
+TBA
+
+=== Crate features
+==== std(default feature)
+The Rust Standard Library support. Required when using reader::StandardReader or testing the package. Disable this if the standard library is not available for your platform.
+
+==== display
+Enables the Display trait for scanner:Token.
+
+==== serial
+embedded_hal::serial::Read support for the reader. Currently the polling implementation is the only one available.
+
+== License
+See link:LICENSE[]
