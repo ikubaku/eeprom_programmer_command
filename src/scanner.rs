@@ -4,8 +4,8 @@ const SCANNED_STRING_BUFFER_SIZE: usize = 16;
 
 pub struct Scanner {
     state: ScannerState,
-    scanned_string: [u8; SCANNED_STRING_BUFFER_SIZE],
-    scanned_number: i32,
+    pub(crate) scanned_string: [u8; SCANNED_STRING_BUFFER_SIZE],
+    pub(crate) scanned_number: i32,
     scanned_number_sign: Sign,
 }
 
