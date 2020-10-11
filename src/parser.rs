@@ -63,7 +63,7 @@ where R: crate::reader::Reader {
         self.reader
     }
 
-    fn parse_command(&mut self) -> Result<Command, ()> {
+    pub fn parse_command(&mut self) -> Result<Command, ()> {
         let cmd = self.get_token()?;
         if cmd != Token::Identifier {
             Err(())
