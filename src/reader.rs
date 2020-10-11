@@ -1,6 +1,9 @@
 #[cfg(feature = "std")]
 use std::io::Read;
 
+#[cfg(feature = "serial")]
+use nb::block;
+
 pub trait Reader {
     fn read(&mut self) -> Option<u8>;
 }
@@ -58,7 +61,7 @@ where R: embedded_hal::serial::Read<u8> {
 impl<R> Reader for SerialReader<R>
 where R: embedded_hal::serial::Read<u8> {
     fn read(&mut self) -> Option<u8> {
-        match self.reader.read() {
+        match block!(self.reader.read()) {
             Ok(c) => Some(c),
             Err(_) => None,
         }
