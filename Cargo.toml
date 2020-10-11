@@ -10,5 +10,8 @@ edition = "2018"
 default = [ "std" ]
 display = []
 std = []
+serial = [ "embedded-hal", "nb" ]
 
 [dependencies]
+nb = { version = "1.0", optional = true }
+embedded-hal = { version = "0.2", optional = true }

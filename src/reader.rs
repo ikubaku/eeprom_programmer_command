@@ -35,3 +35,32 @@ where R: std::io::Read {
         Some(c[0])
     }
 }
+
+#[cfg(feature = "serial")]
+pub struct SerialReader<R> {
+    reader: R
+}
+
+#[cfg(feature = "serial")]
+impl<R> SerialReader<R>
+where R: embedded_hal::serial::Read<u8> {
+    pub fn new(reader: R) -> SerialReader<R> {
+        SerialReader {
+            reader
+        }
+    }
+    pub fn destroy(self) -> R {
+        self.reader
+    }
+}
+
+#[cfg(feature = "serial")]
+impl<R> Reader for SerialReader<R>
+where R: embedded_hal::serial::Read<u8> {
+    fn read(&mut self) -> Option<u8> {
+        match self.reader.read() {
+            OK(c) => Some(c),
+            Err(_) => None,
+        }
+    }
+}
