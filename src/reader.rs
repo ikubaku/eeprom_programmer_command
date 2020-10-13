@@ -76,7 +76,7 @@ where R: embedded_hal::serial::Read<u8> {
 }
 
 #[cfg(feature = "buffer")]
-pub struct BufferReader<A> {
+pub struct BufferReader<A: arrayvec::Array> {
     reader: arrayvec::ArrayVec<A>,
 }
 
