@@ -1,5 +1,7 @@
 = eeprom_programmer_command
 
+image:https://github.com/ikubaku/eeprom_programmer_command/workflows/build/badge.svg[] image:https://github.com/ikubaku/eeprom_programmer_command/workflows/test/badge.svg[] image:https://github.com/ikubaku/eeprom_programmer_command/workflows/rustfmt/badge.svg[]
+
 The command parser for https://github.com/ikubaku/eeprom_programmer.
 
 == Prerequisites
