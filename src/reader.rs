@@ -84,9 +84,14 @@ pub struct BufferReader {
 impl BufferReader {
     pub fn try_new(buffer: &[u8]) -> Result<Self, ()> {
         // We need to push data into the arrayvec reversed because the ArrayVec::pop() works like a stack operation
-        match arrayvec::ArrayVec::<[u8; BUFFER_READER_SIZE]>::try_from(buffer.iter().rev().collect::<&[u8]>()) {
-            Ok(av) => Ok(BufferReader { reader: av }),
-            Err(_) => Err(()),
+        if buffer.len() > BUFFER_READER_SIZE {
+            Err(())
+        } else {
+            let mut av = arrayvec::ArrayVec::<[u8; BUFFER_READER_SIZE]>::new();
+            for c in buffer.iter().rev() {
+                av.push(*c);
+            }
+            Ok(BufferReader { reader: av })
         }
     }
 }
