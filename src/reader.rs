@@ -93,7 +93,7 @@ where A: arrayvec::Array {
 }
 
 #[cfg(feature = "buffer")]
-impl<A> Reader for BufferReader<A> {
+impl<A: arrayvec::Array> Reader for BufferReader<A> {
     fn read(&mut self) -> Option<A> {
         self.reader.iter().next()
     }
