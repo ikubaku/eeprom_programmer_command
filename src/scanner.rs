@@ -46,7 +46,7 @@ impl Scanner {
             state: ScannerState::Initial,
             scanned_string: [0; SCANNED_STRING_BUFFER_SIZE],
             scanned_number: 0,
-            scanned_number_sign: Sign::Positive
+            scanned_number_sign: Sign::Positive,
         }
     }
 
@@ -77,12 +77,15 @@ impl Scanner {
     }
 
     fn push_digit(self: &mut Scanner, d: u8, radix: u8) -> Result<(), ()> {
-        match self.scanned_number.checked_mul(radix as i32)
-            .and_then(|r| r.checked_add(d as i32)) {
+        match self
+            .scanned_number
+            .checked_mul(radix as i32)
+            .and_then(|r| r.checked_add(d as i32))
+        {
             Some(new_value) => {
                 self.scanned_number = new_value;
                 Ok(())
-            },
+            }
             None => Err(()),
         }
     }
@@ -93,7 +96,7 @@ impl Scanner {
                 Some(new_value) => {
                     self.scanned_number = new_value;
                     Ok(())
-                },
+                }
                 None => Err(()),
             }
         } else {
@@ -102,7 +105,7 @@ impl Scanner {
     }
 
     fn push_char(self: &mut Scanner, c: u8) -> Result<(), ()> {
-        for i in 0..SCANNED_STRING_BUFFER_SIZE-1 {
+        for i in 0..SCANNED_STRING_BUFFER_SIZE - 1 {
             if self.scanned_string[i] == b'\0' {
                 self.scanned_string[i] = c;
                 return Ok(());
@@ -165,7 +168,11 @@ impl Scanner {
         } else if c == b'\r' {
             self.state = ScannerState::Finish;
             Some(Token::Identifier)
-        } else if c == b'_' || (b'a' <= c && c <= b'z') || (b'A' <= c && c <= b'Z') || (b'0' <= c && c <= b'9') {
+        } else if c == b'_'
+            || (b'a' <= c && c <= b'z')
+            || (b'A' <= c && c <= b'Z')
+            || (b'0' <= c && c <= b'9')
+        {
             if self.push_char(c).is_err() {
                 self.state = ScannerState::Initial;
                 return Some(Token::Invalid);

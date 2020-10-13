@@ -32,7 +32,9 @@ pub struct Parser<R> {
 }
 
 impl<R> Parser<R>
-where R: crate::reader::Reader {
+where
+    R: crate::reader::Reader,
+{
     pub fn new(reader: R) -> Parser<R> {
         Parser {
             reader,
@@ -232,7 +234,7 @@ where R: crate::reader::Reader {
 
 #[cfg(test)]
 mod test {
-    use crate::parser::{Parser, DeviceName, Command};
+    use crate::parser::{Command, DeviceName, Parser};
     use crate::reader::StandardReader;
 
     #[test]
