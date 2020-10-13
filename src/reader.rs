@@ -6,7 +6,7 @@ use core::convert::TryFrom;
 #[cfg(feature = "buffer")]
 use arrayvec::ArrayVec;
 #[cfg(feature = "buffer")]
-use std::convert::Infallible;
+use core::convert::Infallible;
 
 #[cfg(feature = "buffer")]
 const BUFFER_READER_SIZE: usize = 32;
