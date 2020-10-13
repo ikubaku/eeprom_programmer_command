@@ -1,6 +1,16 @@
 #[cfg(feature = "serial")]
 use nb::block;
 
+#[cfg(feature = "buffer")]
+use core::convert::TryFrom;
+#[cfg(feature = "buffer")]
+use arrayvec::ArrayVec;
+#[cfg(feature = "buffer")]
+use std::convert::Infallible;
+
+#[cfg(feature = "buffer")]
+const BUFFER_READER_SIZE: usize = 32;
+
 pub trait Reader {
     fn read(&mut self) -> Option<u8>;
 }
@@ -62,5 +72,29 @@ where R: embedded_hal::serial::Read<u8> {
             Ok(c) => Some(c),
             Err(_) => None,
         }
+    }
+}
+
+#[cfg(feature = "buffer")]
+pub struct BufferReader<A> {
+    reader: arrayvec::ArrayVec<A>,
+}
+
+#[cfg(feature = "buffer")]
+impl<A> BufferReader<A>
+where A: arrayvec::Array {
+    pub fn try_new(buffer: &[A::Item]) -> Result<Self, ()> {
+        // We need to push data into the arrayvec reversed because the ArrayVec::pop() works like a stack operation
+        match arrayvec::ArrayVec::<[A; BUFFER_READER_SIZE]>::try_from(buffer.iter().rev().collect::<&[A::Item]>()) {
+            Ok(av) => Ok(BufferReader { reader: av }),
+            Err(_) => Err(()),
+        }
+    }
+}
+
+#[cfg(feature = "buffer")]
+impl<A> Reader for BufferReader<A> {
+    fn read(&mut self) -> Option<A> {
+        self.reader.iter().next()
     }
 }

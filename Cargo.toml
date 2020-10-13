@@ -1,6 +1,6 @@
 [package]
 name = "eeprom_programmer_command"
-version = "0.2.5"
+version = "0.2.6"
 authors = ["Hideyuki Teramura <hide4d51@gmail.com>"]
 edition = "2018"
 
@@ -11,7 +11,9 @@ default = [ "std" ]
 display = []
 std = []
 serial = [ "embedded-hal", "nb" ]
+buffer = [ "arrayvec" ]
 
 [dependencies]
 nb = { version = "1.0", optional = true }
 embedded-hal = { version = "0.2", optional = true }
+arrayvec = { version = "0.5", default-features = false, features = [], optional = true }

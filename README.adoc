@@ -21,5 +21,8 @@ Enables the Display trait for scanner:Token.
 ==== serial
 embedded_hal::serial::Read support for the reader. Currently the polling implementation is the only one available.
 
+==== buffer
+Enables parsing of data inside a slice.
+
 == License
 See link:LICENSE[]
