@@ -2,11 +2,11 @@
 use nb::block;
 
 #[cfg(feature = "buffer")]
-use core::convert::TryFrom;
-#[cfg(feature = "buffer")]
 use arrayvec::ArrayVec;
 #[cfg(feature = "buffer")]
 use core::convert::Infallible;
+#[cfg(feature = "buffer")]
+use core::convert::TryFrom;
 
 #[cfg(feature = "buffer")]
 const BUFFER_READER_SIZE: usize = 32;
@@ -17,16 +17,16 @@ pub trait Reader {
 
 #[cfg(feature = "std")]
 pub struct StandardReader<R> {
-    reader: R
+    reader: R,
 }
 
 #[cfg(feature = "std")]
 impl<R> StandardReader<R>
-    where R: std::io::Read {
+where
+    R: std::io::Read,
+{
     pub fn new(reader: R) -> StandardReader<R> {
-        StandardReader {
-            reader
-        }
+        StandardReader { reader }
     }
     pub fn destroy(self) -> R {
         self.reader
@@ -35,11 +35,13 @@ impl<R> StandardReader<R>
 
 #[cfg(feature = "std")]
 impl<R> Reader for StandardReader<R>
-where R: std::io::Read {
+where
+    R: std::io::Read,
+{
     fn read(&mut self) -> Option<u8> {
         let mut c: [u8; 1] = [0];
         if self.reader.read_exact(&mut c).is_err() {
-            return None
+            return None;
         }
 
         Some(c[0])
@@ -48,16 +50,16 @@ where R: std::io::Read {
 
 #[cfg(feature = "serial")]
 pub struct SerialReader<R> {
-    reader: R
+    reader: R,
 }
 
 #[cfg(feature = "serial")]
 impl<R> SerialReader<R>
-where R: embedded_hal::serial::Read<u8> {
+where
+    R: embedded_hal::serial::Read<u8>,
+{
     pub fn new(reader: R) -> SerialReader<R> {
-        SerialReader {
-            reader
-        }
+        SerialReader { reader }
     }
     pub fn destroy(self) -> R {
         self.reader
@@ -66,7 +68,9 @@ where R: embedded_hal::serial::Read<u8> {
 
 #[cfg(feature = "serial")]
 impl<R> Reader for SerialReader<R>
-where R: embedded_hal::serial::Read<u8> {
+where
+    R: embedded_hal::serial::Read<u8>,
+{
     fn read(&mut self) -> Option<u8> {
         match block!(self.reader.read()) {
             Ok(c) => Some(c),
